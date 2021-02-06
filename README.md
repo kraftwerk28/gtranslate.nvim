@@ -31,3 +31,5 @@ nvim to require them
 ```
 
 Select the text to translate (Visual mode), then type `:Translate <language>`
+
+![](showcase.gif)
