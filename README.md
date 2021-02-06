@@ -17,7 +17,7 @@ local function load(use)
 end
 
 vim.cmd 'packadd packer.nvim'
-local packer = require 'packer'.startup{load}
+require 'packer'.startup{load}
 ```
 
 Though you can install rocks manually and then edit `package.path` to allow
