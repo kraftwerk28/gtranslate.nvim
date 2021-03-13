@@ -4,7 +4,10 @@ endif
 let s:save_cpo = &cpoptions
 set cpoptions&vim
 
-" Stolen from
+" The code for defining user command plus autocompletion
+" will be in VimScript until the stable API in Lua will be released
+
+" Stolen from:
 " https://github.com/cjrsgu/google-translate-api-browser/blob/master/src/languages.ts#L5-L113
 let s:langs = {
 \   'auto': 'Automatic', 'af': 'Afrikaans', 'sq': 'Albanian',
@@ -39,12 +42,11 @@ let s:langs = {
 
 let s:langsrev = {}
 let s:langscompl = []
-for kv in items(s:langs)
-  let s:long = substitute(kv[1], ' ', '_', 'g')
-  let s:short = kv[0]
-  let s:langsrev[s:long] = s:short
-  let s:langs[s:short] = s:long
-  call add(s:langscompl, s:long)
+for shortName in keys(s:langs)
+  let s:longName = substitute(s:langs[shortName], ' ', '_', 'g')
+  let s:langsrev[s:longName] = shortName
+  let s:langs[shortName] = s:longName
+  call add(s:langscompl, s:longName)
 endfor
 
 function! s:lng_code(lng)
@@ -70,8 +72,9 @@ function! s:run_translate(...)
       echoerr "Unknown language"
       return
     endif
-    let l:luaexpr = 'require''gtranslate''.translate(vim.fn.submatch(0), '''
-      \ . l:l1 . ''')'
+    let l:luaexpr = printf(
+        \ "require'gtranslate'.translate(vim.fn.submatch(0), '%s')",
+        \ l:l1)
   elseif len(a:000) == 2
     let l:l1 = s:lng_code(a:1)
     let l:l2 = s:lng_code(a:2)
@@ -79,12 +82,13 @@ function! s:run_translate(...)
       echomsg "Unknown language"
       return
     endif
-    let l:luaexpr = 'require''gtranslate''.translate(vim.fn.submatch(0), '''
-      \ . l:l1 . ''', ''' . l:l2 . ''')'
+    let l:luaexpr = printf(
+        \ "require'gtranslate'.translate(vim.fn.submatch(0), '%s', '%s')",
+        \ l:l1,
+        \ l:l2)
   endif
-  let l:fullexpr = 's#\%V\_.*\%V\_.#\=luaeval("' . l:luaexpr . '")#'
   normal! ma
-  execute l:fullexpr
+  execute printf('s#\%%V\_.*\%%V\_.#\=luaeval("%s")#', l:luaexpr)
   normal! `a
 endfunction
 

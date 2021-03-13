@@ -3,11 +3,14 @@ local M = {}
 local function require_libs()
   local ok, cjson = pcall(require, 'cjson')
   if not ok then
-    print('Module `lua-cjson` not installed.')
+    print 'Module `lua-cjson` is not installed'
     return false
   end
   local ok, request = pcall(require, 'http.request')
-  if not ok then print('Module `http` not installed.') end
+  if not ok then
+    print 'Module `http` is not installed'
+    return false
+  end
   local _, utils = pcall(require, 'http.util')
 
   return true, cjson, request, utils
@@ -47,7 +50,7 @@ function M.translate(text, ...)
   if ok then
     return result
   else
-    print('Failed to translate')
+    print('Failed to translate', result)
     return text
   end
 end
