@@ -56,25 +56,22 @@ function! s:lng_code(lng)
   return get(s:langsrev, a:lng, '')
 endfunction
 
-function! s:lang_compl(A, L, P)
+function! s:langCompletion(A, L, P)
   return filter(copy(s:langscompl), 'v:val =~? a:A')
 endfunction
 
-function! s:run_translate(...)
+function! s:runGTranslate(...)
   if index([1, 2], len(a:000)) == -1
     echomsg "Wrong argument number"
     return
   endif
-
   if len(a:000) == 1
     let l:l1 = s:lng_code(a:1)
     if l:l1 == ''
       echoerr "Unknown language"
       return
     endif
-    let l:luaexpr = printf(
-        \ "require'gtranslate'.translate(vim.fn.submatch(0), '%s')",
-        \ l:l1)
+    execute printf("lua require'gtranslate'.exec_translate('%s')", l:l1)
   elseif len(a:000) == 2
     let l:l1 = s:lng_code(a:1)
     let l:l2 = s:lng_code(a:2)
@@ -82,18 +79,14 @@ function! s:run_translate(...)
       echomsg "Unknown language"
       return
     endif
-    let l:luaexpr = printf(
-        \ "require'gtranslate'.translate(vim.fn.submatch(0), '%s', '%s')",
-        \ l:l1,
-        \ l:l2)
+    execute printf("lua require'gtranslate'.exec_gtranslate('%s', '%s')"
+                 \ l:l1, l:l2)
   endif
-  normal! ma
-  execute printf('s#\%%V\_.*\%%V\_.#\=luaeval("%s")#', l:luaexpr)
-  normal! `a
 endfunction
 
-command -nargs=+ -range -complete=customlist,s:lang_compl
-      \ Translate call <SID>run_translate(<f-args>)
+command -nargs=+ -range -complete=customlist,s:langCompletion
+      \ Translate
+      \ call <SID>runGTranslate(<f-args>)
 
 let &cpoptions = s:save_cpo
 unlet s:save_cpo
