@@ -1,35 +1,30 @@
 # gtranslate.nvim
 
 Plugin for neovim to translate text through https://translate.googleapis.com
-written in Lua.
 
-Requires Neovim v0.5
+### Installation:
 
-### Installation
-The best way is to use [packer.nvim](https://github.com/wbthomason/packer.nvim),
-because it allows installing libs from LuaRocks out of the box.
-The plugin requires `lua-cjson` and `http` libraries to work:
-
+Via [packer.nvim](https://github.com/wbthomason/packer.nvim):
 ```lua
-local function load(use)
-  use {'kraftwerk28/gtranslate.nvim', rocks = {'lua-cjson', 'http'}}
-  -- ...other plugins
-end
-
-vim.cmd 'packadd packer.nvim'
-require 'packer'.startup{load}
+use {"kraftwerk28/gtranslate.nvim", requires = {"nvim-lua/plenary.nvim"}}
 ```
 
-Though you can install rocks manually and then edit `package.path` to allow
-nvim to require them
+Via [vim-plug](https://github.com/junegunn/vim-plug):
+```vimscript
+Plug 'kraftwerk28/gtranslate.nvim'
+Plug 'nvim-lua/plenary.nvim'
+```
 
-### Usage
+### Usage:
+
+- Select the text to translate (visual mode);
+- Run one of the following commands:
 
 ```vimscript
 :Translate <from-language> <to-language>
-:Translate <to-language> " In this case, <from-language> is automatic
+:Translate <to-language> " In that case, <from-language> is automatic
 ```
 
-Select the text to translate (Visual mode), then type `:Translate <language>`
+### Showcase:
 
 ![](showcase.gif)
