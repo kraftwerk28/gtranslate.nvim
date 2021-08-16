@@ -1,5 +1,10 @@
 local M = {}
+
 local translate_api = require("api")
+local lang = require("languages")
+
+local default_to_language
+
 local api, fn = vim.api, vim.fn
 
 local function translate_selection(from_lng, to_lng)
@@ -56,8 +61,54 @@ local function translate_selection(from_lng, to_lng)
   end
 end
 
-function M.exec_translate(...)
-  translate_selection(...)
+local function resolve_lang_name(l)
+  if lang.short_to_long[l] ~= nil then return l end
+  if lang.long_to_short[l] ~= nil then return lang.long_to_short[l] end
+end
+
+function M.run(...)
+  local args = {...}
+  local from_lng, to_lng
+  if #args == 0 then
+    if default_to_language == nil then
+      error("")
+    end
+    from_lng, to_lng = "auto", default_to_language
+  elseif #args == 1 then
+    from_lng, to_lng = "auto", args[1]
+  else
+    from_lng, to_lng = args[1], args[2]
+  end
+  from_lng = resolve_lang_name(from_lng)
+  if from_lng == nil then print([[Bad "from" language]]) end
+  to_lng = resolve_lang_name(to_lng)
+  if to_lng == nil then print([[Bad "to" language]]) end
+  translate_selection(from_lng, to_lng)
+end
+
+function M.complete(arg_lead, cmd_line, cursor_pos)
+  local result = {}
+  for _, long_name in pairs(lang.short_to_long) do
+    if long_name:lower():match(arg_lead) then
+      table.insert(result, long_name)
+    end
+  end
+  return result
+end
+
+function M.setup(config)
+  vim.validate {
+    default_to_language = {config.default_to_language, function(l)
+      if
+        l == nil
+        or lang.long_to_short[l] ~= nil
+        or lang.short_to_long[l] ~= nil
+      then
+        return true
+      end
+    end},
+  }
+  default_to_language = config.default_to_language
 end
 
 return M

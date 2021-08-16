@@ -15,6 +15,14 @@ Plug 'kraftwerk28/gtranslate.nvim'
 Plug 'nvim-lua/plenary.nvim'
 ```
 
+### Configuration (optional)
+
+```lua
+require("gtranslate.nvim").setup {
+  default_to_language = "English"
+}
+```
+
 ### Usage:
 
 - Select the text to translate (visual mode);
@@ -23,6 +31,7 @@ Plug 'nvim-lua/plenary.nvim'
 ```vimscript
 :Translate <from-language> <to-language>
 :Translate <to-language> " In that case, <from-language> is automatic
+:Translate " Translate form <default_to_language> to automatic
 ```
 
 ### Showcase:
