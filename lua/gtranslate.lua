@@ -1,6 +1,6 @@
 local M = {}
 
-local translate_api = require("api")
+local translate_api = require("translate_api")
 local lang = require("languages")
 
 local default_to_language

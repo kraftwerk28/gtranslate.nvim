@@ -5,12 +5,11 @@ endif
 let s:save_cpo = &cpoptions
 set cpoptions&vim
 
-function s:surroundArg(_, s)
-  return "'" . substitute(a:s, "'", '\\''', "g") . "'"
-endfunction
-
 function s:argJoin(arglist)
-  return join(map(copy(a:arglist), function("s:surroundArg")), ", ")
+  return join(map(
+       \   copy(a:arglist),
+       \   {_, s -> "'" . substitute(s, "'", '\\''', "g") . "'"}
+       \ ), ", ")
 endfunction
 
 function s:completionWrapper(...)
