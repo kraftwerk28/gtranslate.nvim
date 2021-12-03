@@ -1,6 +1,6 @@
 -- Stolen from:
 -- https://github.com/cjrsgu/google-translate-api-browser/blob/master/src/languages.ts#L5-L113
-local short_to_long = {
+local lang_dict = {
   ["auto"]  = "Automatic",
   ["af"]    = "Afrikaans",
   ["sq"]    = "Albanian",
@@ -110,12 +110,15 @@ local short_to_long = {
   ["zu"]    = "Zulu",
 }
 
+local short_to_long = {}
 local long_to_short = {}
-for k, v in pairs(short_to_long) do
-  long_to_short[v] = k
+for short_name, long_name in pairs(lang_dict) do
+  local long_normalized = long_name:gsub("%s", "_")
+  short_to_long[short_name] = long_normalized
+  long_to_short[long_normalized] = short_name
 end
 
 return {
-  long_to_short = long_to_short,
   short_to_long = short_to_long,
+  long_to_short = long_to_short,
 }

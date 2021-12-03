@@ -7,11 +7,19 @@ local default_to_language
 
 local api, fn = vim.api, vim.fn
 
+local function log_error(message)
+  print("gtranslate.nvim: "..message)
+end
+
 local function translate_selection(from_lng, to_lng)
   local bufnum, start_line, start_col, _ = unpack(fn.getpos("'<"))
   local _, end_line, end_col, _ = unpack(fn.getpos("'>"))
   local selected_lines =
     api.nvim_buf_get_lines(bufnum, start_line-1, end_line, true)
+  if #selected_lines == 0 then
+    log_error("please select a text to translate")
+    return
+  end
 
   local end_col_utf8 = end_col
   local last_line = selected_lines[#selected_lines]
@@ -50,11 +58,8 @@ local function translate_selection(from_lng, to_lng)
       end
       local nth_line = start_line + index - 2
       api.nvim_buf_set_lines(
-        bufnum,
-        nth_line,
-        nth_line + 1,
-        true,
-        {translated_line}
+        bufnum, nth_line, nth_line + 1,
+        true, {translated_line}
       )
     end
     translate_api.translate(line, from_lng, to_lng, callback)
@@ -67,29 +72,29 @@ local function resolve_lang_name(l)
 end
 
 function M.run(...)
-  local args = {...}
+  local nargs = select("#", ...)
   local from_lng, to_lng
-  if #args == 0 then
+  if nargs == 0 then
     if default_to_language == nil then
-      error("")
+      error("`default_to_language` is not set.")
     end
     from_lng, to_lng = "auto", default_to_language
-  elseif #args == 1 then
-    from_lng, to_lng = "auto", args[1]
+  elseif nargs == 1 then
+    from_lng, to_lng = "auto", ...
   else
-    from_lng, to_lng = args[1], args[2]
+    from_lng, to_lng = ...
   end
   from_lng = resolve_lang_name(from_lng)
-  if from_lng == nil then print([[Bad "from" language]]) end
+  if from_lng == nil then log_error("invalid `from` language") end
   to_lng = resolve_lang_name(to_lng)
-  if to_lng == nil then print([[Bad "to" language]]) end
+  if to_lng == nil then log_error("invalid `to` language") end
   translate_selection(from_lng, to_lng)
 end
 
-function M.complete(arg_lead, cmd_line, cursor_pos)
+function M.complete(arg_lead)
   local result = {}
   for _, long_name in pairs(lang.short_to_long) do
-    if long_name:lower():match(arg_lead) then
+    if long_name:lower():match(arg_lead:lower()) then
       table.insert(result, long_name)
     end
   end
