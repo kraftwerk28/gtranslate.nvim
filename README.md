@@ -30,8 +30,8 @@ require("gtranslate.nvim").setup {
 
 ```vimscript
 :Translate <from-language> <to-language>
-:Translate <to-language> " In that case, <from-language> is automatic
-:Translate " Translate form <default_to_language> to automatic
+:Translate <to-language> " In that case, the <from-language> is automatic
+:Translate " Translate to <default_to_language>; <from-language> is automatic
 ```
 
 ### Showcase:
